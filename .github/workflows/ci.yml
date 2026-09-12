@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.0
+      # - name: Setup python
+      #   uses: actions/setup-python@7
+      #   with:
+      #     python-version-file: ".python-version"
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.0.0
+        with:
+          version-file: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Type check
+        run: uv run mypy src tests
+
+      - name: Test
+        run: |
+          uv run pytest
+          exit_code=$?
+
+          if [ "$exit_code" -eq 5 ]; then
+            echo "No tests collected — continuing."
+            exit 0
+          fi
+
+          exit "$exit_code"

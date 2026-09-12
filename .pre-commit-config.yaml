@@ -1,0 +1,43 @@
+repos:
+  # General checking
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.7
+    hooks:
+      - id: ruff-check # Run the linter
+        args: [--fix]
+      - id: ruff-format # Run the formatter
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.13
+    hooks:
+      - id: uv-lock # Make sure uv.lock is up to date
+      - id: uv-export # Sync requirements.txt with uv.lock
+
+  # - repo: local
+  #   hooks:
+  #     # Run pytest
+  #     - id: pytest
+  #       name: pytest
+  #       entry: uv run pytest tests
+  #       language: system
+  #       types: [python]
+  #       args: [-v]
+  #       pass_filenames: false
+  #       always_run: true
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy src tests
+        language: system
+        types: [python]
+        pass_filenames: false
